@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Virtual Lab Uji Urin</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body {
+    font-family: 'Segoe UI';
+    background: linear-gradient(to right, #dfefff, #f7fbff);
+    text-align: center;
+    padding: 10px;
+}
+
+h1 { color: #2c3e50; }
+h2 { color: #34495e; }
+
+.langkah {
+    background: white;
+    width: 80%;
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: left;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    background: white;
+    padding: 15px;
+    margin: 15px;
+    border-radius: 15px;
+    width: 250px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.tabung {
+    width: 70px;
+    height: 150px;
+    border: 3px solid #333;
+    border-radius: 0 0 40px 40px;
+    margin: 10px auto;
+    background: lightblue;
+}
+
+button {
+    margin: 5px;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: #3498db;
+    color: white;
+}
+
+.reset { background: #e74c3c; }
+.download { background: #2ecc71; }
+
+table {
+    margin: 30px auto;
+    border-collapse: collapse;
+    width: 90%;
+    background: white;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+th {
+    background: #3498db;
+    color: white;
+}
+
+td input {
+    width: 100%;
+    border: none;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+
+<h1>🧪 Virtual Lab Uji Kandungan Glukosa dan Protein dalam Urin</h1>
+<h2>Ayo kita melakukan praktikum uji kandungan urin bersama-sama</h2>
+
+<div class="langkah">
+<h3>🔬 Langkah Kerja Uji Glukosa (Benedict)</h3>
+<ol>
+<li>Siapkan sampel urin dalam tabung reaksi</li>
+<li>Tambahkan larutan Benedict ke dalam sampel</li>
+<li>Panaskan tabung reaksi selama beberapa menit</li>
+<li>Amati perubahan warna yang terjadi</li>
+<li>Tentukan kadar glukosa berdasarkan warna yang terbentuk</li>
+</ol>
+
+<h3>🧪 Langkah Kerja Uji Protein (Biuret)</h3>
+<ol>
+<li>Siapkan sampel urin dalam tabung reaksi</li>
+<li>Tambahkan larutan Biuret ke dalam sampel</li>
+<li>Kocok perlahan hingga tercampur</li>
+<li>Amati perubahan warna yang terjadi</li>
+<li>Tentukan ada atau tidaknya protein dalam urin</li>
+</ol>
+</div>
+
+<div class="container" id="lab"></div>
+
+<h2>📊 Tabel Hasil Pengamatan</h2>
+
+<table id="tabel">
+<tr>
+<th>Sampel</th>
+<th>Warna Glukosa</th>
+<th>Kesimpulan Glukosa</th>
+<th>Warna Protein</th>
+<th>Kesimpulan Protein</th>
+</tr>
+
+<tr><td>A</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>B</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>C</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>D</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+<tr><td>E</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+</table>
+
+<button class="download" onclick="downloadPDF()">⬇ Download PDF</button>
+
+<script>
+
+const data = {
+    A: {glukosa: "rendah", protein: false},
+    B: {glukosa: "tidak", protein: false},
+    C: {glukosa: "tinggi", protein: true},
+    D: {glukosa: "sedang", protein: false},
+    E: {glukosa: "tidak", protein: true}
+};
+
+let state = {};
+
+function init() {
+    let lab = document.getElementById("lab");
+
+    Object.keys(data).forEach(kode => {
+
+        state[kode] = {benedict: false};
+
+        lab.innerHTML += `
+        <div class="card">
+            <h3>Sampel ${kode}</h3>
+            <div class="tabung" id="tabung_${kode}"></div>
+
+            <button onclick="tambahBenedict('${kode}')">+ Benedict</button>
+            <button onclick="panaskan('${kode}')">🔥 Panaskan</button>
+            <button onclick="tambahBiuret('${kode}')">+ Biuret</button>
+            <button class="reset" onclick="reset('${kode}')">Reset</button>
+        </div>
+        `;
+    });
+}
+
+function tambahBenedict(kode) {
+    state[kode].benedict = true;
+}
+
+function panaskan(kode) {
+    if (!state[kode].benedict) {
+        alert("Tambahkan Benedict dulu!");
+        return;
+    }
+
+    let hasil = data[kode].glukosa;
+    let tabung = document.getElementById("tabung_" + kode);
+
+    if (hasil === "tidak") tabung.style.background = "blue";
+    else if (hasil === "rendah") tabung.style.background = "green";
+    else if (hasil === "sedang") tabung.style.background = "yellow";
+    else if (hasil === "tinggi") tabung.style.background = "orange";
+}
+
+function tambahBiuret(kode) {
+    let hasil = data[kode].protein;
+    let tabung = document.getElementById("tabung_" + kode);
+
+    if (hasil) tabung.style.background = "purple";
+    else tabung.style.background = "lightblue";
+}
+
+function reset(kode) {
+    state[kode] = {benedict: false};
+    document.getElementById("tabung_" + kode).style.background = "lightblue";
+}
+
+function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    let doc = new jsPDF();
+
+    doc.text("Hasil Pengamatan Uji Urin", 10, 10);
+
+    let y = 20;
+    let table = document.getElementById("tabel");
+
+    for (let i = 1; i < table.rows.length; i++) {
+        let row = table.rows[i];
+
+        let sampel = row.cells[0].innerText;
+        let glukosa = row.cells[1].children[0].value;
+        let kesG = row.cells[2].children[0].value;
+        let protein = row.cells[3].children[0].value;
+        let kesP = row.cells[4].children[0].value;
+
+        doc.text(
+            `Sampel ${sampel}: Glukosa(${glukosa}, ${kesG}) | Protein(${protein}, ${kesP})`,
+            10,
+            y
+        );
+
+        y += 10;
+    }
+
+    doc.save("hasil_pengamatan.pdf");
+}
+
+init();
+
+</script>
+
+</body>
+</html>
